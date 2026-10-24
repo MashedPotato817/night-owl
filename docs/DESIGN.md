@@ -2,7 +2,11 @@
 
 产品范围与验收见 [需求](../demand.md)；本文件只记录实现决策。
 
-## 页面与视觉
+## 1.0 保留模块
+
+旧作息投票收进原生 details，记录与计票契约继续兼容。
+
+### 页面与视觉
 
 顶部导航 → 夜空页头 → 主投票窗口 / 辅助身份卡、公告、便签 → 底部任务栏。桌面双栏，≤800px 单栏，≤480px 缩紧间距；内容最大宽 1160px。
 
@@ -31,3 +35,29 @@
 - 页面先加载 `poll-core.js` 再加载 `app.js`；均使用 `defer`。本地服务只提供白名单资源，不承担计票。
 
 若扩展真实多人版，需另行设计服务端原子计票、请求幂等、反滥用和隐私规则，不把 localStorage 当作身份凭证。
+
+
+## 2.0 模块与服务
+
+首页依次挂载 `#bedtime-tasks`、`#sleep-reasons`、`#sleep-content`，三个模块独立脚本与 CSS；主导航用原生锚点。没有新增前端框架或依赖。`server.cjs` 负责同源 API、静态白名单、提醒调度，导出 `createApp` 供集成测试。
+
+### 私有清单与邮件
+
+- 浏览器键 `night-owl-tasks-token-v2` 保存 32 字节随机十六进制 bearer 凭据，`night-owl-tasks-draft-v2` 保存显式草稿；服务端以凭据 SHA-256 作键，绝不在原因接口公开。无账户找回，共用设备不构成私有身份边界。
+- `GET /api/tasks/config` 查询配置；`POST /api/tasks/session` 领取凭据；`GET /api/tasks` 读取当前提醒，`PUT` 安排或替换，`DELETE` 删除。清单 1–30 条，每条最多 300 字，服务端校验邮箱及时间。
+- 时间按设备次日当地钟点换算 UTC，记录 `scheduledAt`；无配置允许本机保存，不接受服务端邮件安排。服务器 `DATA_DIR/reminders.json` 原子落盘后才确认成功，写失败不变更已提交状态。
+- Resend HTTPS 邮件传输使用 `RESEND_API_KEY` 与 `MAIL_FROM`；15 秒轮询，到期从 scheduled → sending → sent / failed。sent 表示供应商确认接收，不能等同最终到达。明确失败由用户检查邮箱后重新安排，不盲目重复发送。
+- 服务重启恢复持久化队列并处理过期提醒；sending 记录改为 failed（投递结果未知），避免崩溃后盲目重发。发送期间拒绝修改/删除该份提醒；用户可删除其他待发送提醒，队列每次发前读取最新记录，取消/替换不使用旧快照。清单明文持久化，不是端到端加密。
+- 同源检查、JSON 正文上限、每地址安排次数限制；提醒容量 1000。数据目录只应由单实例写入，静态白名单不提供数据和密钥。
+
+### 公开原因与共鸣票
+
+- `createReasonsApi({dataDir})` 返回异步路由处理器；非原因路径返回 false。
+- `GET /api/reasons` 返回 `{reasons:[{id,text,at,votes,voted}]}`；`POST` 接收 `{text}`，trim 后 1–280 字；`PUT /api/reasons/:id/vote` 接收 `{value:boolean}`，逐条赞同/撤回幂等，可赞同多条。
+- 匿名 HttpOnly、SameSite=Strict Cookie `reasons_actor`，服务器仅保存 SHA-256 投票关系；API 不返回投票者。清 Cookie 或换浏览器可绕过身份限制，页面必须说明。
+- `DATA_DIR/reasons.json` 保存版本 1 原因与投票，临时文件重命名后替换内存；损坏数据启动失败避免覆盖。最多 300 条、每条 5000 票。每地址十分钟 5 次分享、120 次写操作，节流最多 2000 个地址哈希，重启清空。
+- 正文最多 4096 字节，整段 Buffer 解码避免分块损坏中文；同源检查、服务端校验，前端用户内容仅用 textContent。公开内容没有作者删除/审核界面；管理员维护与备份在运行环境进行。
+
+### 助眠内容
+
+官方入口分英语播客与环境音乐：Sleep With Me、Nothing Much Happens、SomaFM Drone Zone / Deep Space One。每项标识内容、来源及语言/订阅情况。只由用户点击后新窗口打开，`noopener noreferrer` 与 no-referrer；没有嵌入播放器、远程图片或自动播放。链接核实来源与浏览器验证统一见 [QA](QA.md)。

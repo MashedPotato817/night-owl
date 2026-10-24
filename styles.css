@@ -18,3 +18,5 @@ main{max-width:1160px;margin:auto;padding:48px 0 80px}.intro{display:flex;align-
 /* 2.0 三个功能使用独立模块，旧版投票保留为折叠节目。 */
 .topbar nav a{color:#d8dfef;text-decoration:none;font-size:13px;padding:8px 0;white-space:nowrap}.topbar nav a:hover{color:var(--yellow);text-decoration:underline}.feature-stack{display:grid;gap:28px}.feature-anchor{min-width:0;scroll-margin-top:20px}.legacy-poll{margin-top:32px}.legacy-poll>summary{cursor:pointer;color:var(--paper);padding:12px;border:1px dashed #7782a4;margin-bottom:20px}.feature-anchor:empty::before{content:'正在打开深夜频道…';display:block;color:var(--paper);padding:20px}.feature-stack input:focus-visible,.feature-stack textarea:focus-visible,.feature-stack select:focus-visible{outline:3px solid #aa7cdb;outline-offset:3px}
 @media(max-width:800px){.topbar{flex-wrap:wrap}.topbar nav{flex-wrap:wrap;gap:16px}.topbar nav a{font-size:12px}}@media(max-width:480px){.topbar nav{gap:9px}.topbar nav a,.topbar nav button{font-size:11px}.feature-stack{gap:22px}.intro-tags{flex-wrap:wrap}}
+
+.feature-stack>.feature-anchor{margin-top:0}

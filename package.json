@@ -1,12 +1,12 @@
 {
   "name": "night-owl-club",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "复古桌面风熬夜投票器",
+  "description": "复古深夜小站：私有待办邮件提醒、匿名原因投票与助眠电台",
   "scripts": {
     "dev": "node server.cjs",
     "start": "node server.cjs",
     "test": "node --test tests/*.test.cjs",
-    "check": "node --check app.js && node --check poll-core.js && node --check server.cjs"
+    "check": "node --check app.js && node --check poll-core.js && node --check bedtime-tasks.js && node --check reminder-core.cjs && node --check reasons.js && node --check reasons-api.cjs && node --check sleep-content.js && node --check server.cjs"
   }
 }
