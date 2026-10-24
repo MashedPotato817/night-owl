@@ -2,7 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createReminderStore, createMailTransport } = require('./reminder-core.cjs');
-const files = new Set(['/index.html', '/styles.css', '/app.js', '/poll-core.js', '/bedtime-tasks.js', '/bedtime-tasks.css', '/reasons.js', '/reasons.css', '/sleep-content.js', '/sleep-content.css']);
+const files = new Set(['/index.html', '/tasks.html', '/reasons.html', '/radio.html', '/pages.css', '/site.js', '/styles.css', '/app.js', '/poll-core.js', '/bedtime-tasks.js', '/bedtime-tasks.css', '/reasons.js', '/reasons.css', '/sleep-content.js', '/sleep-content.css']);
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
 function json(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });

@@ -10,7 +10,7 @@ Node.js **18.17+**，无需安装依赖：
 npm run dev
 ```
 
-打开 [本地页面](http://127.0.0.1:4173)，Ctrl+C 停止。`PORT` 可指定端口。请通过 HTTP 访问。服务默认监听 `127.0.0.1`；分享社区指同一服务实例的访问者，本机启动不会自动成为公网网站。
+打开 [今晚几点睡首页](http://127.0.0.1:4173)，通过顶部导航进入 [睡前清单](http://127.0.0.1:4173/tasks.html)、[清醒心事](http://127.0.0.1:4173/reasons.html)、[助眠电台](http://127.0.0.1:4173/radio.html)。Ctrl+C 停止。`PORT` 可指定端口。请通过 HTTP 访问。服务默认监听 `127.0.0.1`；分享社区指同一服务实例的访问者，本机启动不会自动成为公网网站。
 
 ## 配置邮件
 
@@ -43,11 +43,13 @@ npm test
 
 | 入口 | 职责 |
 | --- | --- |
-| `index.html` / `styles.css` | 主页面、三个入口与复古布局 |
+| `index.html` | 今晚几点睡主页面 |
+| `tasks.html` / `reasons.html` / `radio.html` | 三个独立功能页面 |
+| `styles.css` / `pages.css` / `site.js` | 统一视觉、导航、子页面弹窗与时钟 |
 | `bedtime-tasks.js/css` / `reminder-core.cjs` | 私有清单、邮件安排与发送队列 |
 | `reasons.js/css` / `reasons-api.cjs` | 公开原因与幂等共鸣投票 |
 | `sleep-content.js/css` | 助眠外链目录 |
 | `server.cjs` | API、静态资源白名单与队列调度 |
-| `app.js` / `poll-core.js` | 折叠保留的 1.0 作息投票 |
+| `app.js` / `poll-core.js` | 首页作息投票与兼容的本机选票 |
 
 协作规则见 [AGENTS](AGENTS.md)，实现与数据契约见 [DESIGN](docs/DESIGN.md)，集成审查见 [REVIEW](docs/REVIEW.md)。初版标签 `v1.0.0` 保留；2.0 标签 `v2.0.0`。

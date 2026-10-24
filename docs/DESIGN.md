@@ -4,7 +4,7 @@
 
 ## 1.0 保留模块
 
-旧作息投票收进原生 details，记录与计票契约继续兼容。
+作息投票现在是 `/`（`index.html`）主页面，直接展示窗口与身份卡；记录与计票契约继续兼容。
 
 ### 页面与视觉
 
@@ -39,7 +39,7 @@
 
 ## 2.0 模块与服务
 
-首页依次挂载 `#bedtime-tasks`、`#sleep-reasons`、`#sleep-content`，三个模块独立脚本与 CSS；主导航用原生锚点。没有新增前端框架或依赖。`server.cjs` 负责同源 API、静态白名单、提醒调度，导出 `createApp` 供集成测试。
+四个静态页面通过原生链接导航：`/` 作息投票、`/tasks.html` 私有清单、`/reasons.html` 清醒心事、`/radio.html` 助眠电台。每页只加载自己的业务脚本和样式；对应挂载点仍为 `#bedtime-tasks`、`#sleep-reasons`、`#sleep-content`，存储键和 API 不变。导航用 `aria-current="page"` 标识唯一当前页，浏览器原生支持刷新、前进后退和新开页。`styles.css` 维护原有视觉，`pages.css` 统一导航、页头、窗口内边距、侧栏与响应式布局，`site.js` 提供子页面关于弹窗和时钟。未保存清单和未发布心事用 `beforeunload` 确认离开，显式保存/成功提交后清除相应未保存状态。没有新增前端框架或依赖。`server.cjs` 负责同源 API、静态白名单、提醒调度，导出 `createApp` 供集成测试。
 
 ### 私有清单与邮件
 

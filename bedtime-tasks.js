@@ -13,7 +13,7 @@
     <p id="tasks-timezone" class="fineprint"></p><p id="tasks-config" class="tasks-config"></p>
     <div class="tasks-actions"><button type="button" id="tasks-draft">保存到本浏览器</button><button class="primary" id="tasks-schedule" type="submit" disabled>安排明天的邮件 ↗</button><button type="button" id="tasks-delete">删除清单与提醒</button></div>
     </form><p id="tasks-status" role="status" aria-live="polite"></p>
-    <p class="fineprint">关闭网页后，本地 Node 服务仍须运行才能按时发送。服务重启后会补发到期提醒。清除浏览器数据会丢失访问凭据；邮件已被接收后无法撤回。</p></div>`;
+    <p class="fineprint">关闭网页后，提醒服务仍须运行才能按时发送。服务重启后会补发到期提醒。清除浏览器数据会丢失访问凭据；邮件已被接收后无法撤回。</p></div>`;
   const $ = id => document.getElementById(id);
   const fields = { items: $('tasks-items'), email: $('tasks-email'), time: $('tasks-time') };
   const status = $('tasks-status');
@@ -61,9 +61,14 @@
     if (draft && typeof draft === 'object') fill(draft);
     localStorage.setItem('night-owl-storage-test', '1'); localStorage.removeItem('night-owl-storage-test');
   } catch { storageReady = false; report('浏览器存储不可用，当前内容仅在此页面保留，无法安排可管理的私有提醒。'); }
+  const signature = () => JSON.stringify([fields.items.value, fields.email.value, fields.time.value]);
+  let savedState = signature();
+  window.addEventListener('beforeunload', event => {
+    if (signature() !== savedState) { event.preventDefault(); event.returnValue = ''; }
+  });
   timezone(); fields.time.addEventListener('change', timezone);
   $('tasks-draft').addEventListener('click', () => {
-    try { localStorage.setItem(draftKey, JSON.stringify(input())); report('已保存到本浏览器，尚未安排邮件。'); }
+    try { localStorage.setItem(draftKey, JSON.stringify(input())); savedState = signature(); report('已保存到本浏览器，尚未安排邮件。'); }
     catch { report('浏览器保存失败，请先复制清单备份。'); }
   });
   $('tasks-form').addEventListener('submit', async event => {
@@ -78,6 +83,7 @@
         localStorage.setItem(tokenKey, session.token); token = session.token;
       }
       lastReminder = (await api('/api/tasks', 'PUT', data)).reminder;
+      savedState = signature();
       report(describe(lastReminder));
       try { localStorage.setItem(draftKey, JSON.stringify(data)); } catch { report(describe(lastReminder) + ' 本地副本保存失败。'); }
     } catch (error) { report(error.message || '连接失败，未确认安排成功。'); }
@@ -89,7 +95,7 @@
     try {
       if (token) await api('/api/tasks', 'DELETE');
       localStorage.removeItem(draftKey); localStorage.removeItem(tokenKey); token = ''; lastReminder = null;
-      fill({}); report('已删除清单与待发送提醒。');
+      fill({}); savedState = signature(); report('已删除清单与待发送提醒。');
     } catch (error) { report(error.message || '删除未确认成功，请重试。'); }
     finally { lock(false); }
   });
@@ -103,7 +109,7 @@
       }
       if (token) {
         const reminder = (await api('/api/tasks')).reminder;
-        if (initial && reminder) fill(reminder);
+        if (initial && reminder) { fill(reminder); savedState = signature(); }
         if (initial || JSON.stringify(reminder) !== JSON.stringify(lastReminder)) report(describe(reminder));
         lastReminder = reminder;
       }

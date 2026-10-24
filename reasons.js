@@ -16,6 +16,9 @@
   const textarea = mount.querySelector('textarea');
   const list = mount.querySelector('ul');
   const feedback = mount.querySelector('[role="status"]');
+  window.addEventListener('beforeunload', event => {
+    if (textarea.value.trim()) { event.preventDefault(); event.returnValue = ''; }
+  });
   const refresh = mount.querySelector('.reasons-refresh');
   let busy = false;
   let reasons = [];
