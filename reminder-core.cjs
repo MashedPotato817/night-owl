@@ -54,8 +54,11 @@ function createReminderStore({ dataDir, sendMail, configured = false, now = () =
       if (busy || !configured) return;
       busy = true;
       try {
-        for (const [key, record] of Object.entries(records)) {
-          if (record.status !== 'scheduled' || Date.parse(record.scheduledAt) > now().getTime()) continue;
+        for (const key of Object.keys(records)) {
+          // An earlier delivery awaits network I/O; meanwhile another request may cancel
+          // or replace a later reminder. Always inspect its current committed value.
+          const record = records[key];
+          if (!record || record.status !== 'scheduled' || Date.parse(record.scheduledAt) > now().getTime()) continue;
           const sending = { ...record, status: 'sending' };
           persist({ ...records, [key]: sending });
           let result;
