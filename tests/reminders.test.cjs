@@ -105,3 +105,25 @@ test('HTTP分块UTF-8中文完整保留，null请求返回可理解400', async t
   assert.equal(invalid.status, 400); assert.equal((await invalid.json()).error, '清单格式无效');
   assert.equal(tomorrowAt('09:00', 240, new Date('2026-03-08T04:30:00Z'), 300), '2026-03-08T13:00:00.000Z');
 });
+test('等待第一封邮件时删除或替换后续提醒，不复活取消项或发送旧内容', async t => {
+  for (const action of ['delete', 'replace']) {
+    const dataDir = temp(t); let time = new Date('2026-10-24T14:00:00Z'); const deliveries = [];
+    let unblock; let started;
+    const firstStarted = new Promise(resolve => { started = resolve; });
+    const block = new Promise(resolve => { unblock = resolve; });
+    const store = createReminderStore({ dataDir, configured: true, now: () => time, sendMail: async record => {
+      deliveries.push([...record.items]);
+      if (deliveries.length === 1) { started(); await block; }
+    } });
+    const first = store.createSession(); const second = store.createSession();
+    store.save(first, { ...input, items: ['第一份'] }); store.save(second, { ...input, items: ['应取消的旧内容'] });
+    time = new Date('2026-10-25T02:00:00Z');
+    const processing = store.tick(); await firstStarted;
+    if (action === 'delete') store.remove(second);
+    else store.save(second, { ...input, items: ['替换后的明日内容'] });
+    unblock(); await processing;
+    assert.deepEqual(deliveries, [['第一份']]);
+    if (action === 'delete') assert.equal(store.get(second), null);
+    else { assert.deepEqual(store.get(second).items, ['替换后的明日内容']); assert.equal(store.get(second).status, 'scheduled'); }
+  }
+});
