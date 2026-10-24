@@ -1,6 +1,6 @@
 {
   "name": "night-owl-club",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "复古深夜小站：私有待办邮件提醒、匿名原因投票与助眠电台",
   "scripts": {

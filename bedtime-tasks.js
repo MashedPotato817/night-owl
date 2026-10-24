@@ -24,6 +24,7 @@
   let working = false;
   let storageReady = true;
   let lastReminder = null;
+  let hasLocalDraft = false;
   function report(message) { status.textContent = message; }
   function timezone() {
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
@@ -32,7 +33,8 @@
     $('tasks-timezone').textContent = `按本设备时区：${Intl.DateTimeFormat().resolvedOptions().timeZone}，明天 ${tomorrow.toLocaleDateString('zh-CN')} ${fields.time.value || '09:00'}。`;
     return tomorrow.getTimezoneOffset();
   }
-  function input() { return { items: fields.items.value.split('\n').map(item => item.trim()).filter(Boolean), email: fields.email.value.trim(), time: fields.time.value, offset: timezone(), currentOffset: new Date().getTimezoneOffset() }; }
+  function content() { return { items: fields.items.value.split('\n').map(item => item.trim()).filter(Boolean), email: fields.email.value.trim(), time: fields.time.value }; }
+  function input() { return { ...content(), offset: timezone(), currentOffset: new Date().getTimezoneOffset() }; }
   function fill(data) {
     fields.items.value = Array.isArray(data.items) ? data.items.join('\n') : '';
     fields.email.value = typeof data.email === 'string' ? data.email : '';
@@ -41,7 +43,9 @@
   function describe(reminder) {
     if (!reminder) return '还没有安排邮件提醒。';
     const when = new Date(reminder.scheduledAt).toLocaleString('zh-CN');
-    return ({ scheduled: `已安排：${when}，发送到 ${reminder.email}。`, sending: '邮件正在发送，请稍候。', sent: `邮件服务已接收（${reminder.email}），请留意收件箱与垃圾邮件；接收不保证实际送达。`, failed: reminder.error })[reminder.status] || '提醒状态未知。';
+    const message = ({ scheduled: `已安排：${when}，发送到 ${reminder.email}。`, sending: '邮件正在发送，请稍候。', sent: `邮件服务已接收（${reminder.email}），请留意收件箱与垃圾邮件；接收不保证实际送达。`, failed: reminder.error })[reminder.status] || '提醒状态未知。';
+    const sameContent = JSON.stringify(content()) === JSON.stringify({ items: reminder.items, email: reminder.email, time: reminder.time });
+    return message + (sameContent ? '' : ' 当前内容尚未更新到该邮件提醒；重新安排后才会更新。');
   }
   function lock(value) {
     working = value;
@@ -58,7 +62,7 @@
     token = localStorage.getItem(tokenKey) || '';
     let draft = null;
     try { draft = JSON.parse(localStorage.getItem(draftKey) || 'null'); } catch { report('本地草稿已损坏，请重新填写。'); }
-    if (draft && typeof draft === 'object') fill(draft);
+    if (draft && Array.isArray(draft.items)) { fill(draft); hasLocalDraft = true; }
     localStorage.setItem('night-owl-storage-test', '1'); localStorage.removeItem('night-owl-storage-test');
   } catch { storageReady = false; report('浏览器存储不可用，当前内容仅在此页面保留，无法安排可管理的私有提醒。'); }
   const signature = () => JSON.stringify([fields.items.value, fields.email.value, fields.time.value]);
@@ -68,7 +72,7 @@
   });
   timezone(); fields.time.addEventListener('change', timezone);
   $('tasks-draft').addEventListener('click', () => {
-    try { localStorage.setItem(draftKey, JSON.stringify(input())); savedState = signature(); report('已保存到本浏览器，尚未安排邮件。'); }
+    try { localStorage.setItem(draftKey, JSON.stringify(input())); hasLocalDraft = true; savedState = signature(); report('已保存到本浏览器。' + (lastReminder ? ' 现有邮件提醒未更改。' + describe(lastReminder) : '尚未安排邮件。')); }
     catch { report('浏览器保存失败，请先复制清单备份。'); }
   });
   $('tasks-form').addEventListener('submit', async event => {
@@ -85,7 +89,7 @@
       lastReminder = (await api('/api/tasks', 'PUT', data)).reminder;
       savedState = signature();
       report(describe(lastReminder));
-      try { localStorage.setItem(draftKey, JSON.stringify(data)); } catch { report(describe(lastReminder) + ' 本地副本保存失败。'); }
+      try { localStorage.setItem(draftKey, JSON.stringify(data)); hasLocalDraft = true; } catch { report(describe(lastReminder) + ' 本地副本保存失败。'); }
     } catch (error) { report(error.message || '连接失败，未确认安排成功。'); }
     finally { lock(false); }
   });
@@ -94,7 +98,7 @@
     lock(true);
     try {
       if (token) await api('/api/tasks', 'DELETE');
-      localStorage.removeItem(draftKey); localStorage.removeItem(tokenKey); token = ''; lastReminder = null;
+      localStorage.removeItem(draftKey); localStorage.removeItem(tokenKey); token = ''; lastReminder = null; hasLocalDraft = false;
       fill({}); savedState = signature(); report('已删除清单与待发送提醒。');
     } catch (error) { report(error.message || '删除未确认成功，请重试。'); }
     finally { lock(false); }
@@ -109,7 +113,7 @@
       }
       if (token) {
         const reminder = (await api('/api/tasks')).reminder;
-        if (initial && reminder) { fill(reminder); savedState = signature(); }
+        if (initial && reminder && !hasLocalDraft && signature() === savedState) { fill(reminder); savedState = signature(); }
         if (initial || JSON.stringify(reminder) !== JSON.stringify(lastReminder)) report(describe(reminder));
         lastReminder = reminder;
       }
