@@ -3,6 +3,10 @@
   const mount = document.getElementById('sleep-reasons');
   if (!mount) return;
   mount.classList.add('reasons-window', 'window');
+  if (document.querySelector('meta[name="night-owl-mode"]')?.content === 'static') {
+    mount.innerHTML = `<div class="window-bar"><span>夜猫子留言板 / 睡不着的原因</span><span aria-hidden="true">✦</span></div><div class="reasons-body"><h2>这个房间，暂时安静着。</h2><p class="reasons-hint">当前为 GitHub Pages 静态演示，尚未连接共享留言服务。公开分享与共鸣投票暂不可用。</p><p>你可以先把心事写进私有的本机清单，或去电台找一段陪伴夜晚的声音。</p><div class="reasons-actions"><a href="tasks.html" class="sleep-content-link">去睡前清单 →</a><a href="radio.html" class="sleep-content-link">去助眠电台 →</a></div></div>`;
+    return;
+  }
   mount.innerHTML = `<div class="window-bar"><span>夜猫子留言板 / 睡不着的原因</span><span aria-hidden="true">✦</span></div>
     <div class="reasons-body"><h2>今晚，是什么让你醒着？</h2>
     <p class="reasons-hint">这里的分享和票数来自同一服务器的访客。公开留言，请勿填写姓名、邮箱或其他隐私。</p>

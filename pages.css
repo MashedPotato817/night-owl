@@ -9,3 +9,7 @@
 @media(max-width:480px){.topbar{padding:8px 15px}.topbar nav{gap:8px}.topbar nav a{font-size:11px;min-height:44px}.page-intro h1{font-size:30px;line-height:1.5;max-width:320px;margin:17px 0 12px}.page-intro h1 span{display:block}.page-intro>p{font-size:12px}.page-intro .eyebrow{font-size:9px}.page-moon{font-size:120px;top:16px}.bedtime-body,.reasons-body,.sleep-content-body{margin:4px;padding:20px 15px}.bedtime-body h2,.reasons-body h2,.sleep-content h2{font-size:21px}.tasks-fields{grid-template-columns:1fr;gap:0}.tasks-actions{gap:9px}.tasks-actions button{font-size:12px}.bedtime-body .fineprint{font-size:10px}.page-companion ol{grid-template-columns:1fr;gap:10px}.page-companion{padding:18px}.page-companion h2{font-size:16px}.page-home .intro{min-height:250px}}
 
 #tasks-form input,#tasks-form textarea{font-weight:400}
+
+.reasons-actions a{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:2px outset #eee;background:#e0dfd4;color:var(--blue);font-size:12px;text-underline-offset:3px}
+
+.page-reasons.static-mode .feature-layout{grid-template-columns:1fr}

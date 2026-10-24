@@ -64,7 +64,7 @@ function openDialog(title, copy, action = null, confirm = '知道了') {
   $('#dialog-copy').textContent = copy; $('#dialog-confirm').textContent = confirm;
   $('#dialog-cancel').hidden = !action; confirmAction = action; $('#dialog').showModal();
 }
-$('#about').addEventListener('click', () => openDialog('一间留给清醒者的深夜小站。', '夜猫子 BBS 3.0：把待办放进私有清单，设定明早的邮件提醒；公开分享清醒的原因，或者找一段陪伴入眠的声音。\n\n清单和邮箱只供你的浏览器凭据访问；原因分享是公开内容，请勿填写隐私。提醒需要站点配置邮件服务并保持运行。\n\n作息投票使用明确标注的示例统计。愿你今晚安心入眠。'));
+$('#about').addEventListener('click', () => openDialog('一间留给清醒者的深夜小站。', document.querySelector('meta[name="night-owl-mode"]')?.content === 'static' ? '当前为 GitHub Pages 静态演示：作息示例投票、本机清单和助眠链接可用；邮件提醒、共享心事和共鸣投票暂不可用。' : '夜猫子 BBS 3.0：把待办放进私有清单，设定明早的邮件提醒；公开分享清醒的原因，或者找一段陪伴入眠的声音。\n\n清单和邮箱只供你的浏览器凭据访问；原因分享是公开内容，请勿填写隐私。提醒需要站点配置邮件服务并保持运行。\n\n作息投票使用明确标注的示例统计。愿你今晚安心入眠。'));
 $('#withdraw').addEventListener('click', () => openDialog('要收回这份深夜心事吗？', '撤回后，将删除本浏览器的选票与时间记录。你随时可以重新投票。', () => { persist(null); render(); showView('vote', true); announce(storageAvailable ? '已撤回，你可以重新选择。' : '已在当前会话撤回，但浏览器存储不可用，旧记录可能仍存在。'); }, '确认撤回'));
 $('#goodnight').addEventListener('click', () => openDialog('今天就到这里吧。晚安 ☾', '把没做完的事留给明天，把这一刻留给自己。\n\n放下屏幕，舒展一下肩膀。愿你今晚睡个好觉。', null, '给今天画个句号 ✓'));
 $('#close-dialog').addEventListener('click', () => $('#dialog').close());

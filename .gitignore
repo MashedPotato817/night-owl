@@ -5,3 +5,5 @@ Thumbs.db
 artifacts/
 .playwright-cli/
 .night-owl-data/
+
+_site/

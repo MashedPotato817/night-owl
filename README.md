@@ -53,3 +53,12 @@ npm test
 | `app.js` / `poll-core.js` | 首页作息投票与兼容的本机选票 |
 
 协作规则见 [AGENTS](AGENTS.md)，实现与数据契约见 [DESIGN](docs/DESIGN.md)，集成审查见 [REVIEW](docs/REVIEW.md)。当前发布标签：`v3.0.0`。历史标签 `v1.0.0`、`v2.0.0` 保留。
+
+
+## GitHub Pages
+
+在线地址：[夜猫子 BBS](https://mashedpotato817.github.io/night-owl/)。GitHub Pages 部署为静态演示：作息示例投票、本机清单和助眠外链可用；邮件提醒、公开原因分享及共鸣投票需要 Node 服务，在线静态版明确显示暂不可用，不发送 API 请求。
+
+推送 main 后，`.github/workflows/pages.yml` 自动检查、测试、导出并部署。发布内容仅来自 `npm run build:pages` 生成的 `_site/` 白名单，不含服务器、数据目录、测试或截图；导航兼容仓库子路径。本地 `npm start` 保留完整 API 模式，已有版本标签不移动。
+
+首次配置 Pages 发布源为 **GitHub Actions**；流程参考 [GitHub 官方文档](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。

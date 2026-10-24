@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  const staticMode = document.querySelector('meta[name="night-owl-mode"]')?.content === 'static';
   const mount = document.getElementById('bedtime-tasks');
   if (!mount) return;
   mount.classList.add('window', 'bedtime-window');
@@ -15,6 +16,13 @@
     </form><p id="tasks-status" role="status" aria-live="polite"></p>
     <p class="fineprint">关闭网页后，提醒服务仍须运行才能按时发送。服务重启后会补发到期提醒。清除浏览器数据会丢失访问凭据；邮件已被接收后无法撤回。</p></div>`;
   const $ = id => document.getElementById(id);
+  if (staticMode) {
+    mount.querySelector('.bedtime-body > p').textContent = '清单仅保存在本浏览器，清除浏览器数据后无法恢复。请勿在共用设备记录敏感内容。';
+    mount.querySelector('.tasks-fields').hidden = true;
+    $('tasks-timezone').hidden = true;
+    $('tasks-schedule').hidden = true;
+    mount.querySelector('.bedtime-body > .fineprint').textContent = '本页面为静态演示，不会发送邮件。写好后请点击保存；离开页面前记得备份重要事项。';
+  }
   const fields = { items: $('tasks-items'), email: $('tasks-email'), time: $('tasks-time') };
   const status = $('tasks-status');
   const tokenKey = 'night-owl-tasks-token-v2';
@@ -97,7 +105,7 @@
     if (working || !window.confirm('删除本浏览器的清单和服务器上的待发送提醒？已发送邮件无法撤回。')) return;
     lock(true);
     try {
-      if (token) await api('/api/tasks', 'DELETE');
+      if (token && !staticMode) await api('/api/tasks', 'DELETE');
       localStorage.removeItem(draftKey); localStorage.removeItem(tokenKey); token = ''; lastReminder = null; hasLocalDraft = false;
       fill({}); savedState = signature(); report('已删除清单与待发送提醒。');
     } catch (error) { report(error.message || '删除未确认成功，请重试。'); }
@@ -105,6 +113,11 @@
   });
   async function refresh(initial = false) {
     if (working) return;
+    if (staticMode) {
+      $('tasks-config').textContent = '在线静态演示：支持本机保存，暂不提供定时邮件。';
+      lock(false);
+      return;
+    }
     try {
       if (initial) {
         configured = (await api('/api/tasks/config')).configured;

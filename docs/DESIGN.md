@@ -62,3 +62,12 @@
 ### 助眠内容
 
 官方入口分英语播客与环境音乐：Sleep With Me、Nothing Much Happens、SomaFM Drone Zone / Deep Space One。每项标识内容、来源及语言/订阅情况。只由用户点击后新窗口打开，`noopener noreferrer` 与 no-referrer；没有嵌入播放器、远程图片或自动播放。链接核实来源与浏览器验证统一见 [QA](QA.md)。
+
+
+## GitHub Pages 导出
+
+`scripts/build-pages.cjs` 仅复制四个 HTML 与业务所需 JS/CSS 到 `_site/`，写入 `.nojekyll`；非白名单文件出现在目标目录时拒绝发布。导出 HTML 增加 `night-owl-mode=static` meta 和 static-mode body class，将站内绝对导航改为相对链接，以兼容 `/night-owl/` 子路径。
+
+静态模式清单只使用 localStorage，隐藏邮件输入和安排按钮，删除不请求服务器；原因页显示服务未连接说明与清单/电台入口，不展示公开提交表单。两个模块均不调用 API，关于弹窗说明可用范围。源码 HTML 无此标记，因此本地 Node 模式不受影响。
+
+main 推送触发 Actions：语法检查与测试 → 导出 → configure-pages → upload-pages-artifact（仅 `_site`）→ deploy-pages；部署使用 github-pages 环境及 Pages/OIDC 权限。

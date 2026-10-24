@@ -24,3 +24,8 @@
 - 本次交付为 `v3.0.0`：完成代码 review、文档与实现对齐、运行检查后提交到 main，再创建版本标签；不移动旧标签。此前 2.0 的三个 Agent/worktree 协作过程见 [Review](docs/REVIEW.md)。
 
 运行与配置见 [README](README.md)，实现约定见 [DESIGN](docs/DESIGN.md)，验证证据见 [QA](docs/QA.md)。
+
+
+## GitHub Pages 部署范围
+
+将静态演示部署到现有 `MashedPotato817/night-owl` 仓库的 GitHub Pages。保留四页导航、作息示例投票、本机清单与助眠外链；纯静态环境不运行邮件与共享留言 API，界面明确标示不可用。完整服务端模式继续由本地 Node 服务提供。部署不公开本机私有数据，原有版本标签不移动。
