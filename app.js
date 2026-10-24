@@ -64,7 +64,7 @@ function openDialog(title, copy, action = null, confirm = '知道了') {
   $('#dialog-copy').textContent = copy; $('#dialog-confirm').textContent = confirm;
   $('#dialog-cancel').hidden = !action; confirmAction = action; $('#dialog').showModal();
 }
-$('#about').addEventListener('click', () => openDialog('一间留给清醒者的深夜小站。', '夜猫子 BBS是一个复古风投票 demo。所有统计由 1,024 份固定示例票与本浏览器的一票组成，不代表真实社区数据。\n\n无需账户，也没有追踪服务。你的选择只保存在当前浏览器，可以随时修改或撤回。\n\n愿你有属于自己的夜晚，也有安心入睡的时刻。'));
+$('#about').addEventListener('click', () => openDialog('一间留给清醒者的深夜小站。', '夜猫子 BBS 2.0：把待办放进私有清单，设定明早的邮件提醒；公开分享清醒的原因，或者找一段陪伴入眠的声音。\n\n清单和邮箱只供你的浏览器凭据访问；原因分享是公开内容，请勿填写隐私。提醒需要站点配置邮件服务并保持运行。\n\n旧版作息投票保留，仍使用示例统计。愿你今晚安心入眠。'));
 $('#withdraw').addEventListener('click', () => openDialog('要收回这份深夜心事吗？', '撤回后，将删除本浏览器的选票与时间记录。你随时可以重新投票。', () => { persist(null); render(); showView('vote', true); announce(storageAvailable ? '已撤回，你可以重新选择。' : '已在当前会话撤回，但浏览器存储不可用，旧记录可能仍存在。'); }, '确认撤回'));
 $('#goodnight').addEventListener('click', () => openDialog('今天就到这里吧。晚安 ☾', '把没做完的事留给明天，把这一刻留给自己。\n\n放下屏幕，舒展一下肩膀。愿你今晚睡个好觉。', null, '给今天画个句号 ✓'));
 $('#close-dialog').addEventListener('click', () => $('#dialog').close());
